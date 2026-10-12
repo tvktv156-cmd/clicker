@@ -11,7 +11,7 @@
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
+  projectId: "1:522775819889:web:a7ae7bf35aa2317aec0dd0",
   storageBucket: "YOUR_PROJECT.appspot.com",
   messagingSenderId: "YOUR_SENDER_ID",
   appId: "YOUR_APP_ID"
