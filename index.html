@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Монетный Кликер</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪙</text></svg>" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366f1',
+            secondary: '#8b5cf6',
+            accent: '#f59e0b',
+            dark: '#0f172a',
+            card: '#1e293b'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overscroll-behavior: none;
+      background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+      min-height: 100dvh;
+    }
+    .click-btn {
+      transition: transform 0.1s ease, box-shadow 0.15s ease;
+      user-select: none;
+    }
+    .click-btn:active {
+      transform: scale(0.92);
+    }
+    .coin-fly {
+      position: fixed;
+      pointer-events: none;
+      font-size: 1.4rem;
+      font-weight: 700;
+      animation: flyUp 0.85s ease-out forwards;
+      z-index: 100;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    @keyframes flyUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-90px) scale(1.5); }
+    }
+    .upgrade-card, .skin-card {
+      transition: all 0.2s ease;
+    }
+    .upgrade-card:active, .skin-card:active {
+      transform: scale(0.97);
+    }
+    .glass {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .progress-bar { transition: width 0.35s ease; }
+    ::-webkit-scrollbar { width: 0; height: 0; }
+    .skin-selected {
+      ring: 2px solid #818cf8;
+      box-shadow: 0 0 0 2px #818cf8, 0 0 20px rgba(99,102,241,0.35);
+    }
+    .leader-me {
+      background: linear-gradient(90deg, rgba(99,102,241,0.25), transparent);
+      border-left: 3px solid #818cf8;
+    }
+  </style>
+</head>
+<body class="text-white overflow-x-hidden">
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="min-h-dvh flex flex-col items-center justify-center px-6 relative">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-16 left-8 w-36 h-36 bg-indigo-500/25 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-32 right-6 w-44 h-44 bg-purple-500/20 rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="relative z-10 w-full max-w-sm text-center">
+      <div class="text-6xl mb-4 animate-bounce">🪙</div>
+      <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+        Монетный Кликер
+      </h1>
+      <p class="text-slate-400 mb-8 text-sm">Кликай • Прокачивай • Соревнуйся</p>
+      
+      <div class="glass rounded-2xl p-6 shadow-2xl">
+        <h2 class="text-lg font-semibold mb-5">Вход / Регистрация</h2>
+        
+        <button id="google-login-btn" class="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-medium py-3.5 px-4 rounded-xl hover:bg-gray-100 active:scale-[0.98] transition-all shadow-lg mb-3">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Войти через Google
+        </button>
+
+        <button id="demo-login-btn" class="w-full flex items-center justify-center gap-2 bg-slate-700/80 text-slate-200 font-medium py-3 px-4 rounded-xl hover:bg-slate-600/80 active:scale-[0.98] transition-all text-sm">
+          🎮 Войти как гость (демо)
+        </button>
+        
+        <div id="login-status" class="mt-3 text-xs text-slate-500 hidden"></div>
+        <div class="mt-4 text-xs text-slate-500">
+          Для реального Google-входа заполни <code class="text-indigo-300">firebase-config.js</code>
+        </div>
+      </div>
+      
+      <p class="mt-6 text-slate-500 text-xs">v2.0 • Прокачка • Скины • Топ игроков</p>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app-screen" class="hidden min-h-dvh flex flex-col">
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-4 py-3 flex items-center justify-between border-b border-slate-700/40">
+      <div class="flex items-center gap-3">
+        <img id="user-avatar-img" class="w-10 h-10 rounded-full hidden shadow-lg object-cover" alt="" />
+        <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-lg font-bold shadow-lg">
+          U
+        </div>
+        <div>
+          <div id="user-name" class="font-semibold text-sm leading-tight">Игрок</div>
+          <div class="text-xs text-slate-400">Ур. <span id="user-level">1</span> · <span id="auth-badge" class="text-indigo-300">Гость</span></div>
+        </div>
+      </div>
+      <button id="logout-btn" class="text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-slate-700/50 transition">
+        Выйти
+      </button>
+    </header>
+
+    <!-- Balance -->
+    <div class="px-4 pt-4 pb-1">
+      <div class="glass rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs text-slate-400 uppercase tracking-wider mb-0.5">Баланс</div>
+          <div class="flex items-baseline gap-1">
+            <span id="coin-balance" class="text-3xl font-bold text-amber-400 tabular-nums">0</span>
+            <span class="text-amber-500/80 text-lg">🪙</span>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-slate-400">Сила клика</div>
+          <div class="text-xl font-semibold text-indigo-300">+<span id="click-power">1</span></div>
+          <div id="combo-display" class="text-xs text-orange-400 opacity-0 transition-opacity">Комбо ×<span id="combo-value">1</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Click Area -->
+    <div class="flex-1 flex flex-col items-center justify-center px-4 py-4 relative min-h-[220px]">
+      <div id="cps-display" class="absolute top-1 text-sm text-slate-400 opacity-0 transition-opacity">
+        <span id="cps-value">0</span> 🪙/сек
+      </div>
+      
+      <button id="click-btn" class="click-btn relative w-44 h-44 sm:w-52 sm:h-52 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(99,102,241,0.35)]">
+        <div id="click-btn-inner" class="absolute inset-2 rounded-full flex items-center justify-center">
+          <span id="click-emoji" class="text-5xl sm:text-6xl select-none">🪙</span>
+        </div>
+        <div class="absolute -bottom-1.5 bg-slate-900/95 px-3.5 py-0.5 rounded-full text-[11px] font-medium border border-slate-600">
+          НАЖМИ!
+        </div>
+      </button>
+      
+      <div class="mt-5 text-center text-sm text-slate-400">
+        Кликов: <span id="total-clicks" class="text-white font-medium">0</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="px-3 pb-2">
+      <div class="flex gap-1 glass rounded-xl p-1 overflow-x-auto">
+        <button data-tab="upgrades" class="tab-btn flex-1 min-w-[70px] py-2 rounded-lg text-xs font-medium bg-indigo-600 text-white transition whitespace-nowrap">
+          Прокачка
+        </button>
+        <button data-tab="skins" class="tab-btn flex-1 min-w-[70px] py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition whitespace-nowrap">
+          Скины
+        </button>
+        <button data-tab="leaderboard" class="tab-btn flex-1 min-w-[70px] py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition whitespace-nowrap">
+          Топ
+        </button>
+        <button data-tab="stats" class="tab-btn flex-1 min-w-[70px] py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition whitespace-nowrap">
+          Статы
+        </button>
+      </div>
+    </div>
+
+    <!-- Panels -->
+    <div class="px-3 pb-5 max-h-[38vh] overflow-y-auto">
+      <div id="panel-upgrades" class="space-y-2.5"></div>
+      <div id="panel-skins" class="hidden grid grid-cols-2 gap-2.5"></div>
+      <div id="panel-leaderboard" class="hidden space-y-2"></div>
+      <div id="panel-stats" class="hidden space-y-3">
+        <div class="glass rounded-xl p-4 space-y-2.5">
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-400">Всего заработано</span>
+            <span id="stat-total-earned" class="font-medium text-amber-400">0 🪙</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-400">Всего кликов</span>
+            <span id="stat-total-clicks" class="font-medium">0</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-400">Автодоход</span>
+            <span id="stat-cps" class="font-medium text-green-400">0 🪙/сек</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-400">Сила клика</span>
+            <span id="stat-power" class="font-medium text-indigo-300">1</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-slate-400">Уровень</span>
+            <span id="stat-level" class="font-medium">1</span>
+          </div>
+          <div class="mt-1">
+            <div class="flex justify-between text-xs text-slate-500 mb-1">
+              <span>Опыт</span>
+              <span id="xp-text">0 / 100</span>
+            </div>
+            <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div id="xp-bar" class="progress-bar h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <button id="reset-btn" class="w-full py-2.5 rounded-xl glass text-red-400 text-sm font-medium hover:bg-red-500/10 transition">
+          Сбросить прогресс
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (compat for simplicity) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
